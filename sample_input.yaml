@@ -1,0 +1,27 @@
+Excel: bat_test.xlsx  #The excel file containing the sample data
+Sheet:                #The names of the sheets containing the sample data
+  - 3Healthy    
+  - 3Infected
+  - 3Mock
+  - 6Healthy
+  - 6Infected
+  - 6Mock
+Markers:     #How the samples are differentiated within the excel file.
+  - H1
+  - H2
+  - H3
+  - In1
+  - In2
+  - In3
+  - M1
+  - M2
+  - M3
+Group:     #The groups that are going to be compared to one another
+  ThreeTier:  #What the name of the sheet is going to be called in the excel file.
+    - 3Healthy
+    - 3Infected
+    - 3Mock
+  SixTier:
+    - 6Healthy
+    - 6Infected
+    - 6Mock
