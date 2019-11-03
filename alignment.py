@@ -50,6 +50,7 @@ def main(file_):
     #This block of code reads all the excel sheets listed in the yaml input file
     #and stores the data recorded in those sheets accordingly. Each sample is recorded as an instance 
     #of the Sample class, and all classes are catalogued within the code in a dictionary.
+    print("Working Now ....")
     volatiles = {}
     for sheet in yaml_dick['Sheet']:
         volatiles[sheet] = {}
@@ -72,7 +73,7 @@ def main(file_):
                             volatiles[sheet][marker].hit.extend(excel[col][(i+1):])
                         elif cell == "Quality":
                             volatiles[sheet][marker].quality.extend(excel[col][(i+1):])
-                        elif cell == "Normalization":
+                        elif cell == "Normalization nMol":
                             volatiles[sheet][marker].normalization.extend(excel[col][(i+1):])
                         break
 
@@ -95,9 +96,9 @@ def main(file_):
     for gru in yaml_dick['Group']:
         volatile_copy = copy.deepcopy(volatiles)
         current_rt_value = minimum_rt - 0.5
-        excel_file.create_sheet(gru)
+        excel_file.create_sheet("{}".format(gru))
         current_sheet = excel_file[gru]
-        column = ord("A")
+        column = 0
         line=1
         for sheet in yaml_dick['Group'][gru]:
             for mark in volatiles[sheet]:
@@ -121,13 +122,14 @@ def main(file_):
                 
         line=3
 
+        increment = 0.07
         while current_rt_value < maximum_rt:
             match_found = False
-            column = ord("A")
+            column = 0
             for sheet in yaml_dick['Group'][gru]:
                 for mark in volatiles[sheet]:
                     for i,rt in enumerate(volatile_copy[sheet][mark].RT):
-                        if abs(rt - current_rt_value) < 0.01:
+                        if abs(rt - current_rt_value) < increment:
                             match_found = True
                             cell1 = get_cell_value(column,line)
                             cell2 = get_cell_value(column+1,line) 
@@ -156,9 +158,12 @@ def main(file_):
                     column += 5
             if match_found:
                 line += 1
-            current_rt_value += 0.01
+            if current_rt_value > 10.0:
+                increment = 0.01
+            current_rt_value += increment
             
     excel_file.save(yaml_dick['Excel'])    
+    print("Finished :)")
 
 def get_cell_value(column_int,line):
     """
@@ -167,14 +172,17 @@ def get_cell_value(column_int,line):
     This function will work for excel columns between A and ZZ. Breaks down at AAA. If you have that many values
     rewrite function or make a second spreadsheet.
     """    
-    if column_int / ord("[") < 1: #[ is the next value after Z in the ASCII table. 
-        col = chr(column_int)     #This is a check whether 1 or two letters are needed to designate cell.
+    if column_int < 26:                  
+        col = chr(ord("A") + column_int)     #This is a check whether 1 or two letters are needed to designate cell.
         return "{}{}".format(col,line)
     else:
-        temp1 = int(column_int / ord("["))
-        temp2 = column_int % ord("[")
+        
+        temp1 = int(column_int / 26)
+
+        temp2 = column_int % 26
         first_letter = ord("A") - 1 + temp1
         second_letter = ord("A") + temp2
+
 
         return "{}{}{}".format(chr(first_letter),chr(second_letter),line)
 
